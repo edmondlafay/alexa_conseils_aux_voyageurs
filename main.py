@@ -4,7 +4,7 @@ This sample demonstrates a simple skill built with the Amazon Alexa Skills Kit.
 For additional samples, visit the Alexa Skills Kit Getting Started guide at
 http://amzn.to/1LGWsLG
 """
-import json, unicodedata
+import json, unicodedata, re
 from botocore.vendored import requests
 from bs4 import BeautifulSoup
 
@@ -37,20 +37,26 @@ SPECIAL_COUNTRIES_OUTPUT = {
 
 # --------------- Helpers that build all of the responses ----------------------
 
-def build_speechlet_response(title, output, reprompt_text, should_end_session):
-    return {
-        'outputSpeech': {'type': 'PlainText', 'text': output},
-        'card': {'type': 'Simple', 'title': title, 'content': output},
-        'reprompt': {'outputSpeech': {'type': 'PlainText', 'text': reprompt_text}},
-        'shouldEndSession': should_end_session
-    }
+def clean_output_text(text):
+    """ Remove extra spaces
+    """
+    return re.sub(r"(\s\s+|\s$)", "", text)
 
-def build_response(session_attributes, speechlet_response):
+def ssml_to_text(ssml):
+    """ Remove all ssml tags
+    """
+    return re.sub(r"<[^>]+>", "", ssml)
+
+def build_response(session_attributes, title, output, reprompt_text, should_end_session):
     return {
         'version': '1.0',
-        'sessionAttributes': session_attributes, 'response': speechlet_response
+        'sessionAttributes': session_attributes, 'response': {
+            'outputSpeech': {'type': 'SSML', 'ssml': "<speak>{}</speak>".format(output)},
+            'card': {'type': 'Simple', 'title': title, 'content': clean_output_text(ssml_to_text(output))},
+            'reprompt': {'outputSpeech': {'type': 'SSML', 'ssml': "<speak>{}</speak>".format(reprompt_text)}},
+            'shouldEndSession': should_end_session
+        }
     }
-
 
 # --------------- Functions that control the skill's behavior ------------------
 
@@ -63,15 +69,24 @@ def get_start_end_response(should_end_session):
     else:
         card_title = "Conseils aux voyageurs"
         speech_output = "Bienvenue a conseils aux voyageurs. "
-        reprompt_text = "Demandez le status d'un pays en disant: Alexa, demande à Conseils Aux Voyageurs quel est le status de la France."
+        reprompt_text = "Demandez le status d'un pays en disant: " \
+        "Alexa, demande à Conseils Aux Voyageurs le status de la France."
 
-    return build_response(session_attributes, build_speechlet_response(
-        card_title, speech_output + reprompt_text, reprompt_text, should_end_session))
+    return build_response(session_attributes, 
+        card_title, speech_output + reprompt_text, reprompt_text, should_end_session)
+
+
+def clean_country(raw_country):
+    """
+        Remove all accents, spaces and quotes
+    """
+    country = ''.join((c for c in unicodedata.normalize('NFD', raw_country) if unicodedata.category(c) != 'Mn'))
+    country = re.sub(r"(\s|')", "-", country) # replace space and quotes with dash
+    return country
 
 
 def fetch_info_for(raw_country):
-    country = ''.join((c for c in unicodedata.normalize('NFD', raw_country) if unicodedata.category(c) != 'Mn'))
-    country = country.replace(u' ', u'-').replace(u"'", u'-')
+    country = clean_country(raw_country)
     if country in SPECIAL_COUNTRIES_INPUT:
         page = requests.get(STATUS_URL + SPECIAL_COUNTRIES_INPUT[country])
     else:
@@ -104,7 +119,9 @@ def get_country_info(intent, session):
     should_end_session = True
     speech_output = "Je n'ai pas d'information pour le pays demandé. "
     country_not_found = True
-    reprompt_text = "Rendez-vous sur diplomatie.gouv.fr ou voyage.gc.ca section conseils aux voyageurs pour des informations detaillées en français."
+    reprompt_text = "Rendez-vous sur diplomatie.gouv.fr, " \
+    "ou voyage<say-as interpret-as='spell-out'>.gc.ca</say-as>, " \
+    "section conseils aux voyageurs pour plus d'informations."
 
     if 'paysFR' in intent['slots']:
         country = intent['slots']['paysFR']['value']
@@ -118,8 +135,8 @@ def get_country_info(intent, session):
     if country_not_found:
         print("UNKNOWN intent CountryStatusIntent slotes : {}".format(json.dumps(intent['slots'])))
         
-    return build_response(session_attributes, build_speechlet_response(
-        card_title, speech_output + reprompt_text, reprompt_text, should_end_session))
+    return build_response(session_attributes, 
+        card_title, speech_output + reprompt_text, speech_output, should_end_session)
 
 
 # --------------- Events ------------------
