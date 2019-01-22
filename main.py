@@ -365,6 +365,16 @@ def fetch_info_for(raw_country):
     return ''
 
 
+def clean_country_info_intent(speech):
+    res = re.sub(r"aller a ", '', speech)
+    res = re.sub(r"aller à ", '', speech)
+    res = re.sub(r"aller aux ", '', speech)
+    res = re.sub(r"aller au ", '', speech)
+    res = re.sub(r"situation du ", '', speech)
+    res = re.sub(r"situation de ", '', speech)
+    res = re.sub(r"situation des ", '', speech)
+    return res
+
 def get_country_info(intent, session):
     """ Fetch country status from voyage.gc.ca
     """
@@ -382,7 +392,7 @@ def get_country_info(intent, session):
     "section conseils aux voyageurs pour plus d'informations."
 
     if 'paysFR' in intent['slots']:
-        country = intent['slots']['paysFR']['value']
+        country = clean_country_info_intent(intent['slots']['paysFR']['value'])
         print("COUNTRY {}".format(country))
         session_attributes = {"country": country}
         res = fetch_info_for(country)
