@@ -373,6 +373,9 @@ def clean_country_info_intent(speech):
     res = re.sub(r"situation du ", '', speech)
     res = re.sub(r"situation de ", '', speech)
     res = re.sub(r"situation des ", '', speech)
+    res = re.sub(r"statut du ", '', speech)
+    res = re.sub(r"statut de ", '', speech)
+    res = re.sub(r"statut des ", '', speech)
     return res
 
 def get_country_info(intent, session):
