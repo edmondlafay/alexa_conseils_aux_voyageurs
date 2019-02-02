@@ -351,7 +351,7 @@ def clean_output(text):
   res = res.replace(u' du Canada ', u' ')
   res = res.replace(u' aux Canadiens ', u' aux voyageurs ')
   res = res.replace(u"du service d’Inscription des Canadiens à l’étranger", u'de votre représentant consulaire')
-  res = res.replace(u';', ' ')
+  res = res.replace(u';', ', ')
   return res.replace(u"Situation en matière de sécurité Inscription des Canadiens à l’étranger", u'')
                     
 
@@ -362,9 +362,10 @@ def fetch_info_for(raw_country):
         if page.status_code == 200:
             advisories = BeautifulSoup(page.content, 'html.parser').find(id='advisories')
             if advisories:
-                empty_tag = advisories.find(href="#securite")
-                if empty_tag:
-                  empty_tag.clear()
+                empty_tags = advisories.find_all(href="#securite")
+                if empty_tags:
+                    for empty_tag in advices:
+                        empty_tag.clear()
                 advices = advisories("p")
                 if advices:
                     advice_array = []
