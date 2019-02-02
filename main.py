@@ -344,7 +344,14 @@ def clean_country(raw_country):
     country = ''.join((c for c in unicodedata.normalize('NFD', raw_country) if unicodedata.category(c) != 'Mn'))
     country = re.sub(r"(\s|')", "-", country) # replace space and quotes with dash
     return country
+  
 
+def clean_output(text):
+  res = text.replace(u'(voir ci-dessous)', u'')
+  res = res.replace(u' du Canada ', u' ')
+  res = res.replace(u"du service d’Inscription des Canadiens à l’étranger", u'de votre représentant consulaire')
+  return res.replace(u"Situation en matière de sécurité Inscription des Canadiens à l’étranger", u'')
+                    
 
 def fetch_info_for(raw_country):
     country = clean_country(raw_country)
@@ -353,16 +360,18 @@ def fetch_info_for(raw_country):
         if page.status_code == 200:
             advisories = BeautifulSoup(page.content, 'html.parser').find(id='advisories')
             if advisories:
-                advice = advisories.find("p")
+                empty_tag = advisories.find(href="#securite")
+                if empty_tag:
+                  empty_tag.clear()
+                advice = advisories("p")
                 if advice:
-                    res = ' '.join(advice.stripped_strings).replace(u'\xa0', u' ')
+                    res = []
+                    for advice_texte in advice:
+                      res.append(advice_texte)
+                    res = ' '.join(list(filter(None, res))).replace(u'\xa0', u' ')
                     if country in SPECIAL_COUNTRIES_OUTPUT:
                         res = res.replace(SPECIAL_COUNTRIES_OUTPUT[country]['key'], SPECIAL_COUNTRIES_OUTPUT[country]['val'])
-                    res = res.replace(u'(voir ci-dessous)', u'')
-                    res = res.replace(u' du Canada ', u' ')
-                    res = res.replace(u"du service d’Inscription des Canadiens à l’étranger", u'de votre représentant consulaire')
-                    res = res.replace(u"Situation en matière de sécurité Inscription des Canadiens à l’étranger", u'')
-                    return res
+                    return clean_output(res)
     return ''
 
 
