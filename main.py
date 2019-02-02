@@ -367,7 +367,7 @@ def fetch_info_for(raw_country):
                 if advices:
                     advice_array = []
                     for advice in advices:
-                        advice_array.append(advice)
+                        advice_array.append(advice.get_text())
                     advice_array = list(filter(None, advice_array)) # clean empty strings
                     res = ' '.join(advice_array).replace(u'\xa0', u' ')
                     if country in SPECIAL_COUNTRIES_OUTPUT:
