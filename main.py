@@ -349,7 +349,9 @@ def clean_country(raw_country):
 def clean_output(text):
   res = text.replace(u'(voir ci-dessous)', u'')
   res = res.replace(u' du Canada ', u' ')
+  res = res.replace(u' aux Canadiens ', u' aux voyageurs ')
   res = res.replace(u"du service d’Inscription des Canadiens à l’étranger", u'de votre représentant consulaire')
+  res = res.replace(u';', ' ')
   return res.replace(u"Situation en matière de sécurité Inscription des Canadiens à l’étranger", u'')
                     
 
