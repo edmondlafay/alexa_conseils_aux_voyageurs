@@ -366,22 +366,8 @@ def fetch_info_for(raw_country):
 
 
 def clean_country_info_intent(speech):
-    res = re.sub(r"aller a ", '', speech)
-    res = re.sub(r"aller à ", '', speech)
-    res = re.sub(r"aller aux ", '', speech)
-    res = re.sub(r"aller au ", '', speech)
-    res = re.sub(r"situation du ", '', speech)
-    res = re.sub(r"situation de ", '', speech)
-    res = re.sub(r"situation de la ", '', speech)
-    res = re.sub(r"situation des ", '', speech)
-    res = re.sub(r"statut du ", '', speech)
-    res = re.sub(r"statut de ", '', speech)
-    res = re.sub(r"statut de la ", '', speech)
-    res = re.sub(r"statut des ", '', speech)
-    res = re.sub(r"statue du ", '', speech)
-    res = re.sub(r"statue de ", '', speech)
-    res = re.sub(r"statue de la ", '', speech)
-    res = re.sub(r"statue des ", '', speech)
+    # https://regex101.com/r/uzNDps/1/
+    res = re.sub(r"(aller|situation|statut|statue|status)\s(a|à|a|a|du|de)(u|x|s| la)*\s", '', speech)
     return res
 
 def get_country_info(intent, session):
