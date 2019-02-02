@@ -364,7 +364,7 @@ def fetch_info_for(raw_country):
             if advisories:
                 empty_tags = advisories.find_all(href="#securite")
                 if empty_tags:
-                    for empty_tag in advices:
+                    for empty_tag in empty_tags:
                         empty_tag.clear()
                 advices = advisories("p")
                 if advices:
