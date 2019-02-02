@@ -363,13 +363,15 @@ def fetch_info_for(raw_country):
                 if empty_tags:
                     for empty_tag in empty_tags:
                         empty_tag.clear()
-                advice_array = []
-                for advice in advisories:
-                    advice_array.append("{}".format(advice))
-                res = BeautifulSoup("".join(advice_array)).get_text(' ', strip=True)
-                if country in SPECIAL_COUNTRIES_OUTPUT:
-                    res = res.replace(SPECIAL_COUNTRIES_OUTPUT[country]['key'], SPECIAL_COUNTRIES_OUTPUT[country]['val'])
-                return clean_output(res)
+                advices = advisories('p')
+                if advices:
+                    advice_array = []
+                    for advice in advices:
+                        advice_array.append("{}".format(advice))
+                    res = BeautifulSoup("".join(advice_array)).get_text(' ', strip=True)
+                    if country in SPECIAL_COUNTRIES_OUTPUT:
+                        res = res.replace(SPECIAL_COUNTRIES_OUTPUT[country]['key'], SPECIAL_COUNTRIES_OUTPUT[country]['val'])
+                    return clean_output(res)
     return ''
 
 
