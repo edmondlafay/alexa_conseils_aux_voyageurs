@@ -360,7 +360,8 @@ def fetch_info_for(raw_country):
                         res = res.replace(SPECIAL_COUNTRIES_OUTPUT[country]['key'], SPECIAL_COUNTRIES_OUTPUT[country]['val'])
                     res = res.replace(u'(voir ci-dessous)', u'')
                     res = res.replace(u' du Canada ', u' ')
-                    res = res.replace(u"Inscrivez-vous auprès du service d’inscription des Canadiens à l’étranger et lisez attentivement les messages diffusés par celui-ci. Situation en matière de sécurité Inscription des Canadiens à l’étranger", u' ')
+                    res = res.replace(u"du service d’Inscription des Canadiens à l’étranger", u'de votre représentant consulaire')
+                    res = res.replace(u"Situation en matière de sécurité Inscription des Canadiens à l’étranger", u'')
                     return res
     return ''
 
