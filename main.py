@@ -363,12 +363,13 @@ def fetch_info_for(raw_country):
                 empty_tag = advisories.find(href="#securite")
                 if empty_tag:
                   empty_tag.clear()
-                advice = advisories("p")
-                if advice:
-                    res = []
-                    for advice_texte in advice:
-                        res.append(advice_texte)
-                    res = ' '.join(list(filter(None, res))).replace(u'\xa0', u' ')
+                advices = advisories("p")
+                if advices:
+                    advice_array = []
+                    for advice in advices:
+                        advice_array.append(advice)
+                    advice_array = list(filter(None, advice_array)) # clean empty strings
+                    res = ' '.join(advice_array).replace(u'\xa0', u' ')
                     if country in SPECIAL_COUNTRIES_OUTPUT:
                         res = res.replace(SPECIAL_COUNTRIES_OUTPUT[country]['key'], SPECIAL_COUNTRIES_OUTPUT[country]['val'])
                     return clean_output(res)
