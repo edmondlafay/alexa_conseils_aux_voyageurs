@@ -295,11 +295,6 @@ SPECIAL_COUNTRIES_OUTPUT = {
 
 # --------------- Helpers that build all of the responses ----------------------
 
-def clean_output_text(text):
-    """ Remove extra spaces
-    """
-    return re.sub(r"(\s\s+|\s$)", "", text)
-
 def ssml_to_text(ssml):
     """ Remove all ssml tags
     """
@@ -348,12 +343,14 @@ def clean_country(raw_country):
 
 def clean_output(text):
   res = text.replace(u'(voir ci-dessous)', u'')
+  res = text.replace(u'ci-dessous', u'suivant')
   res = res.replace(u' du Canada ', u' ')
   res = res.replace(u' aux Canadiens ', u' aux voyageurs ')
   res = res.replace(u"du service d’Inscription des Canadiens à l’étranger", u'de votre représentant consulaire')
-  res = res.replace(u';', ', ')
-  return res.replace(u"Situation en matière de sécurité Inscription des Canadiens à l’étranger", u'')
-                    
+  res = res.replace(u';', ',')
+  res.replace(u"Situation en matière de sécurité Inscription des Canadiens à l’étranger", u'')
+  return re.sub(r"(\s\s+|\s$)", "", res) # remove extra whitespaces
+
 
 def fetch_info_for(raw_country):
     country = clean_country(raw_country)
@@ -366,16 +363,13 @@ def fetch_info_for(raw_country):
                 if empty_tags:
                     for empty_tag in empty_tags:
                         empty_tag.clear()
-                advices = advisories("p")
-                if advices:
-                    advice_array = []
-                    for advice in advices:
-                        advice_array.append(advice.get_text())
-                    advice_array = list(filter(None, advice_array)) # clean empty strings
-                    res = ' '.join(advice_array).replace(u'\xa0', u' ')
-                    if country in SPECIAL_COUNTRIES_OUTPUT:
-                        res = res.replace(SPECIAL_COUNTRIES_OUTPUT[country]['key'], SPECIAL_COUNTRIES_OUTPUT[country]['val'])
-                    return clean_output(res)
+                advice_array = []
+                for advice in advisories:
+                    advice_array.append("{}".format(advice))
+                res = BeautifulSoup("".join(advice_array)).get_text(' ', strip=True)
+                if country in SPECIAL_COUNTRIES_OUTPUT:
+                    res = res.replace(SPECIAL_COUNTRIES_OUTPUT[country]['key'], SPECIAL_COUNTRIES_OUTPUT[country]['val'])
+                return clean_output(res)
     return ''
 
 
