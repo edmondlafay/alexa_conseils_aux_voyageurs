@@ -367,7 +367,7 @@ def fetch_info_for(raw_country):
                 if advice:
                     res = []
                     for advice_texte in advice:
-                      res.append(advice_texte)
+                        res.append(advice_texte)
                     res = ' '.join(list(filter(None, res))).replace(u'\xa0', u' ')
                     if country in SPECIAL_COUNTRIES_OUTPUT:
                         res = res.replace(SPECIAL_COUNTRIES_OUTPUT[country]['key'], SPECIAL_COUNTRIES_OUTPUT[country]['val'])
