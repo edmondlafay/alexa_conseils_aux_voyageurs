@@ -305,7 +305,7 @@ def build_response(session_attributes, title, output, reprompt_text, should_end_
         'version': '1.0',
         'sessionAttributes': session_attributes, 'response': {
             'outputSpeech': {'type': 'SSML', 'ssml': "<speak>{}</speak>".format(output)},
-            'card': {'type': 'Simple', 'title': title, 'content': clean_output_text(ssml_to_text(output))},
+            'card': {'type': 'Simple', 'title': title, 'content': ssml_to_text(output)},
             'reprompt': {'outputSpeech': {'type': 'SSML', 'ssml': "<speak>{}</speak>".format(reprompt_text)}},
             'shouldEndSession': should_end_session
         }
