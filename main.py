@@ -397,8 +397,8 @@ def get_country_info(intent, session):
     "section conseils aux voyageurs pour plus d'informations."
 
     if 'paysFR' in intent['slots']:
+        print("COUNTRY {}".format(intent['slots']['paysFR']))
         country = clean_country_info_intent(intent['slots']['paysFR']['value'])
-        print("COUNTRY {}".format(country))
         session_attributes = {"country": country}
         res = fetch_info_for(country)
         if len(res)>5:
