@@ -88,7 +88,7 @@ def fetch_info_for(raw_country):
                     advice_array = []
                     for advice in advices:
                         advice_array.append("{}".format(advice))
-                    res = BeautifulSoup("".join(advice_array)).get_text(' ', strip=True)
+                    res = BeautifulSoup("".join(advice_array), features="html.parser").get_text(' ', strip=True)
                     if country in SPECIAL_COUNTRIES_OUTPUT:
                         res = res.replace(SPECIAL_COUNTRIES_OUTPUT[country]['key'], SPECIAL_COUNTRIES_OUTPUT[country]['val'])
                     return clean_output(res)
